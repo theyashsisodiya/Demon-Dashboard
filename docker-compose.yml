@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  demon-dashboard:
+    build: .
+    container_name: demon-dashboard
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount SQLite database file to preserve keys and logs on container rebuilds
+      - ./keys.db:/app/keys.db
+      - ./dark.zip:/app/dark.zip

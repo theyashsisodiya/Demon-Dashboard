@@ -124,22 +124,28 @@ ngrok http 8080
 
 ---
 
-### Method B: Deploy using Docker
+### Method B: Deploy using Docker (One-Click)
 
-1. **Create `Dockerfile`:**
-   ```dockerfile
-   FROM python:3.11-alpine
-   WORKDIR /app
-   COPY . /app
-   EXPOSE 8080
-   CMD ["python", "server.py"]
-   ```
+1. **One-Click Launch:**
+   - **Windows:** Double-click `run_docker.bat`
+   - **Linux / macOS:** Run `chmod +x run_docker.sh && ./run_docker.sh`
+   - **Manual CLI:**
+     ```bash
+     docker compose up -d --build
+     ```
 
-2. **Build and Run:**
+2. **Management & Logs:**
    ```bash
-   docker build -t demon-dashboard .
-   docker run -d -p 8080:8080 -v $(pwd)/keys.db:/app/keys.db --name demon-dashboard-app demon-dashboard
+   # View real-time access logs
+   docker logs -f demon-dashboard
+
+   # Stop container
+   docker compose down
+
+   # Restart container
+   docker compose restart
    ```
+   *The `keys.db` database and `dark.zip` are mapped via volumes, preserving your keys and device bindings across updates and container restarts.*
 
 ---
 

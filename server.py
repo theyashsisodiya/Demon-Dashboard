@@ -15,8 +15,8 @@ import secrets
 import string
 import socket
 
-PORT = 8080
-DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "keys.db")
+PORT = int(os.environ.get("PORT", 8080))
+DB_FILE = os.environ.get("DB_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "keys.db"))
 DARK_ZIP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dark.zip")
 
 def get_local_ip():
