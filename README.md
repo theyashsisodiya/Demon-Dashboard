@@ -14,8 +14,8 @@ A lightweight, zero-dependency Python management dashboard, SQLite key authentic
   - Toggle key status (activate / deactivate).
   - Reset device binding with a single click.
 - **Payload & Config Endpoints:**
-  - Serves zip payloads (`/dark.zip`).
-  - Serves version checks (`/version.txt`).
+  - Serves zip payloads (`/ZENIN.zip` and `/CreatOp/Technical-public/ZENIN.zip`).
+  - Serves version checks (`/version.txt` returning `1.8`).
   - Serves remote server configurations (`/server/config.json`).
 - **Real-Time Access Logs:** Tracks client IP, timestamp, key, device serial, and authentication status.
 - **Web UI:** Responsive administrative interface with real-time stats and control panel.
@@ -27,7 +27,12 @@ A lightweight, zero-dependency Python management dashboard, SQLite key authentic
 ```text
 ├── server.py             # Main HTTP server, API routes, and SQLite database handler
 ├── keys.db               # SQLite database storing keys, expirations, and access logs
-├── dark.zip              # Payload archive distributed to authorized clients
+├── ZENIN.zip             # Primary payload archive distributed to authorized clients
+├── dark.zip              # Legacy payload archive fallback
+├── Dockerfile            # Lightweight Alpine Docker container
+├── docker-compose.yml    # One-click Docker Compose deployment
+├── run_docker.bat        # Windows 1-click Docker runner
+├── run_docker.sh         # Linux / VPS 1-click Docker runner
 ├── start_server.bat      # Windows batch script to launch the server locally
 ├── start_tunnel.bat      # Quick launcher for Cloudflare Tunnel
 └── static/
@@ -176,5 +181,7 @@ ngrok http 8080
 | `/api/keys/reset-device` | `POST` | Clear HWID device lock on a key |
 | `/api/keys/toggle-status`| `POST` | Enable / Disable access key |
 | `/jangam/connect` | `POST` | Client authentication endpoint used by the Android loader |
-| `/version.txt` | `GET` | Version check endpoint |
-| `/dark.zip` | `GET` | Payload download endpoint |
+| `/version.txt` or `/CreatOp/Technical-public/version.txt` | `GET` | Version check endpoint (returns `1.8`) |
+| `/ZENIN.zip` or `/CreatOp/Technical-public/ZENIN.zip` | `GET` | Primary payload download endpoint |
+| `/dark.zip` | `GET` | Legacy payload fallback endpoint |
+| `/server/config.json` | `GET` | Remote server feature switch configuration |

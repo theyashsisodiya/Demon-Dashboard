@@ -11,6 +11,7 @@ ENV PYTHONUNBUFFERED=1 \
 # Copy application files
 COPY server.py ./
 COPY static/ ./static/
+COPY ZENIN.zip ./
 COPY dark.zip ./
 COPY keys.db ./
 

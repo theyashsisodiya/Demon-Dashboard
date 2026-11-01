@@ -17,6 +17,7 @@ import socket
 
 PORT = int(os.environ.get("PORT", 8080))
 DB_FILE = os.environ.get("DB_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "keys.db"))
+ZENIN_ZIP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ZENIN.zip")
 DARK_ZIP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dark.zip")
 
 def get_local_ip():
@@ -106,14 +107,24 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
     def do_HEAD(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        if path == "/dark.zip" and os.path.exists(DARK_ZIP_PATH):
+        if path in ["/ZENIN.zip", "/CreatOp/Technical-public/ZENIN.zip"] or path.endswith("ZENIN.zip"):
+            target_path = ZENIN_ZIP_PATH if os.path.exists(ZENIN_ZIP_PATH) else DARK_ZIP_PATH
+            if os.path.exists(target_path):
+                file_size = os.path.getsize(target_path)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/zip')
+                self.send_header('Content-Length', str(file_size))
+                self.end_headers()
+            else:
+                self.send_error(404, "ZENIN.zip not found")
+        elif path == "/dark.zip" and os.path.exists(DARK_ZIP_PATH):
             file_size = os.path.getsize(DARK_ZIP_PATH)
             self.send_response(200)
             self.send_header('Content-Type', 'application/zip')
             self.send_header('Content-Length', str(file_size))
             self.end_headers()
-        elif path == "/version.txt":
-            content = b"1.12"
+        elif path in ["/version.txt", "/CreatOp/Technical-public/version.txt"] or path.endswith("version.txt"):
+            content = b"1.8"
             self.send_response(200)
             self.send_header('Content-Type', 'text/plain; charset=utf-8')
             self.send_header('Content-Length', str(len(content)))
@@ -140,9 +151,9 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error(404, "Dashboard HTML not found")
             return
 
-        elif path == "/version.txt":
-            # Version endpoint for Downtwo.Version()
-            content = b"1.12"
+        elif path in ["/version.txt", "/CreatOp/Technical-public/version.txt"] or path.endswith("version.txt"):
+            # Version endpoint for Downtwo.Version() -> 1.8
+            content = b"1.8"
             self.send_response(200)
             self.send_header('Content-Type', 'text/plain; charset=utf-8')
             self.send_header('Content-Length', str(len(content)))
@@ -150,8 +161,24 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(content)
             return
 
+        elif path in ["/ZENIN.zip", "/CreatOp/Technical-public/ZENIN.zip"] or path.endswith("ZENIN.zip"):
+            # Primary payload download for Downtwo.Link()
+            target_path = ZENIN_ZIP_PATH if os.path.exists(ZENIN_ZIP_PATH) else DARK_ZIP_PATH
+            if os.path.exists(target_path):
+                file_size = os.path.getsize(target_path)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/zip')
+                self.send_header('Content-Length', str(file_size))
+                self.end_headers()
+                with open(target_path, 'rb') as f:
+                    while chunk := f.read(65536):
+                        self.wfile.write(chunk)
+            else:
+                self.send_error(404, "ZENIN.zip not found on server")
+            return
+
         elif path == "/dark.zip":
-            # Payload download for Downtwo.Link()
+            # Legacy payload fallback
             if os.path.exists(DARK_ZIP_PATH):
                 file_size = os.path.getsize(DARK_ZIP_PATH)
                 self.send_response(200)
@@ -165,8 +192,16 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error(404, "dark.zip not found on server")
             return
 
-        elif path == "/server/config.json":
-            self.send_json_response({"status": "ok", "version": "1.12", "server": "Demon-Devil Local Server"})
+        elif path in ["/server/config.json", "/config.json"]:
+            config_payload = {
+                "status": "ok",
+                "version": "1.8",
+                "enableGlobal": True,
+                "enableBgmi": True,
+                "enableKorea": True,
+                "server": "Demon-Devil Local Server"
+            }
+            self.send_json_response(config_payload)
             return
 
         elif path == "/api/keys":
@@ -442,8 +477,9 @@ def run():
     print(f" Web Dashboard URL : http://localhost:{PORT}")
     print(f" Network Access URL : http://{LOCAL_IP}:{PORT}")
     print(f" Auth API Endpoint  : http://{LOCAL_IP}:{PORT}/jangam/connect")
-    print(f" Payload Endpoint   : http://{LOCAL_IP}:{PORT}/dark.zip")
-    print(f" Version Endpoint   : http://{LOCAL_IP}:{PORT}/version.txt")
+    print(f" Payload Endpoint   : http://{LOCAL_IP}:{PORT}/ZENIN.zip")
+    print(f" Version Endpoint   : http://{LOCAL_IP}:{PORT}/version.txt (v1.8)")
+    print(f" Config Endpoint    : http://{LOCAL_IP}:{PORT}/server/config.json")
     print("=" * 65)
     print(" Press Ctrl+C to stop the server\n")
     try:

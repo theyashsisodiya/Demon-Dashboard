@@ -13,4 +13,5 @@ services:
     volumes:
       # Mount SQLite database file to preserve keys and logs on container rebuilds
       - ./keys.db:/app/keys.db
+      - ./ZENIN.zip:/app/ZENIN.zip
       - ./dark.zip:/app/dark.zip
